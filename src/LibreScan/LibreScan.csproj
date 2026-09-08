@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>LibreScan</RootNamespace>
+    <AssemblyName>LibreScan</AssemblyName>
+    <Version>1.0.0</Version>
+    <Authors>LibreScan Security Project</Authors>
+    <Product>LibreScan Security</Product>
+    <Description>Premium Windows-native antivirus frontend for ClamAV</Description>
+    <Copyright>Copyright © 2026 LibreScan Security Project</Copyright>
+
+    <!-- Single-File Deployment -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+
+    <!-- Application Icon -->
+    <ApplicationIcon>..\..\Assets\librescan.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Prevent WinForms global using from colliding with WPF types like Application -->
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+</Project>

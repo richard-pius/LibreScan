@@ -1,0 +1,20 @@
+# Build output
+publish/
+Output/
+**/bin/
+**/obj/
+
+# ClamAV binaries (downloaded by build pipeline)
+clamav_bin/
+
+# Quarantine data
+Quarantine/
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# Temp
+_clamav_extract_temp/
+*.zip
