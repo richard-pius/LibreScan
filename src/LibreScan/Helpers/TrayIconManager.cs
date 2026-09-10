@@ -1,19 +1,26 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
+using LibreScan.Services;
 using WinForms = System.Windows.Forms;
 
 namespace LibreScan.Helpers;
 
 /// <summary>
 /// Manages the System Tray (NotifyIcon) lifecycle.
-/// CRITICAL: Dispose() MUST be called in Application.Exit to prevent taskbar ghosting.
+/// Disposes unmanaged GDI handles and NotifyIcon to prevent taskbar ghosting.
 /// </summary>
-public sealed class TrayIconManager : IDisposable
+public sealed partial class TrayIconManager : IDisposable
 {
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DestroyIcon(IntPtr hIcon);
+
     private WinForms.NotifyIcon?       _notifyIcon;
     private WinForms.ContextMenuStrip? _contextMenu;
+    private Icon?                      _trayIcon;
     private readonly Window            _mainWindow;
 
     public event EventHandler? QuickScanRequested;
@@ -56,52 +63,123 @@ public sealed class TrayIconManager : IDisposable
         exitItem.Click += (_, _) => ExitRequested?.Invoke(this, EventArgs.Empty);
 
         // ── NotifyIcon ───────────────────────────────────────────────────
+        _trayIcon = CreateShieldIcon();
+
         _notifyIcon = new WinForms.NotifyIcon
         {
             Text             = "LibreScan Security",
-            Icon             = CreateShieldIcon(),
+            Icon             = _trayIcon,
             Visible          = true,
             ContextMenuStrip = _contextMenu,
         };
 
         _notifyIcon.DoubleClick += (_, _) => ShowMainWindow();
+        _notifyIcon.BalloonTipClicked += (_, _) => ShowMainWindow();
     }
 
     /// <summary>Show a balloon tooltip from the tray icon.</summary>
     public void ShowBalloon(string title, string text,
         WinForms.ToolTipIcon icon = WinForms.ToolTipIcon.Info)
     {
-        _notifyIcon?.ShowBalloonTip(3000, title, text, icon);
+        try
+        {
+            _notifyIcon?.ShowBalloonTip(4000, title, text, icon);
+        }
+        catch { }
+    }
+
+    /// <summary>Displays notification based on scan outcome.</summary>
+    public void NotifyScanCompleted(Models.ScanResult result, string label)
+    {
+        if (result.Cancelled) return;
+
+        if (result.MalwareDetected || result.ThreatsFound > 0)
+        {
+            ShowBalloon(
+                "⚠ Threats Detected!",
+                $"{result.ThreatsFound} threat(s) found during {label}. Click to review and quarantine.",
+                WinForms.ToolTipIcon.Warning);
+        }
+        else if (result.Success)
+        {
+            ShowBalloon(
+                "Scan Complete",
+                $"{label} finished. No threats found in {result.FilesScanned:N0} files.",
+                WinForms.ToolTipIcon.Info);
+        }
+        else
+        {
+            ShowBalloon(
+                "Scan Finished",
+                $"{label} encountered warnings or locked files. Exit code: {result.ExitCode}.",
+                WinForms.ToolTipIcon.Warning);
+        }
+    }
+
+    /// <summary>Displays notification based on update outcome.</summary>
+    public void NotifyUpdateCompleted(bool success)
+    {
+        if (success)
+        {
+            ShowBalloon(
+                "Definitions Updated",
+                "ClamAV virus definitions have been successfully updated.",
+                WinForms.ToolTipIcon.Info);
+        }
+        else
+        {
+            ShowBalloon(
+                "Update Notice",
+                "Could not refresh virus definitions. Will retry automatically.",
+                WinForms.ToolTipIcon.Warning);
+        }
     }
 
     /// <summary>Update the tooltip text shown on hover.</summary>
-    public void UpdateTooltip(string text)
+    public void UpdateTooltip(string? text)
     {
         if (_notifyIcon is not null)
-            _notifyIcon.Text = text.Length > 63 ? text[..63] : text;
+        {
+            string s = string.IsNullOrWhiteSpace(text) ? "LibreScan Security" : text;
+            _notifyIcon.Text = s.Length > 63 ? s[..63] : s;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
 
-    private void ShowMainWindow()
+    public void ShowMainWindow()
     {
-        _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
+        if (_mainWindow is MainWindow mw)
+        {
+            mw.ActivateFromTray();
+        }
+        else
+        {
+            _mainWindow.Show();
+            _mainWindow.WindowState = WindowState.Normal;
+            _mainWindow.Activate();
+        }
     }
 
     /// <summary>
-    /// Generates a teal shield + checkmark icon programmatically so the app
-    /// ships without external icon dependencies.
+    /// Generates a teal shield + checkmark icon programmatically or loads librescan.ico.
+    /// Safely frees unmanaged GDI handles with DestroyIcon.
     /// </summary>
     private static Icon CreateShieldIcon()
     {
         try
         {
-            string appIconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "librescan.ico");
-            if (File.Exists(appIconPath))
+            string[] candidatePaths = [
+                Path.Combine(AppContext.BaseDirectory, "Assets", "librescan.ico"),
+                Path.Combine(ClamAVService.BaseDir, "Assets", "librescan.ico"),
+            ];
+
+            foreach (var p in candidatePaths)
             {
-                return new Icon(appIconPath, 32, 32);
+                if (File.Exists(p))
+                {
+                    return new Icon(p, 32, 32);
+                }
             }
 
             using var bitmap = new Bitmap(32, 32,
@@ -137,20 +215,24 @@ public sealed class TrayIconManager : IDisposable
             ]);
 
             var hIcon = bitmap.GetHicon();
-            return Icon.FromHandle(hIcon);
+            try
+            {
+                using var tempIcon = Icon.FromHandle(hIcon);
+                return (Icon)tempIcon.Clone();
+            }
+            finally
+            {
+                DestroyIcon(hIcon);
+            }
         }
         catch
         {
-            // Fallback to the built-in shield icon
             return SystemIcons.Shield;
         }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// MUST be called in Application.Exit to prevent taskbar ghosting.
-    /// </summary>
     public void Dispose()
     {
         if (_notifyIcon is not null)
@@ -162,5 +244,8 @@ public sealed class TrayIconManager : IDisposable
 
         _contextMenu?.Dispose();
         _contextMenu = null;
+
+        _trayIcon?.Dispose();
+        _trayIcon = null;
     }
 }

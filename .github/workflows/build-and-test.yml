@@ -1,0 +1,29 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore Dependencies
+      run: dotnet restore LibreScan.slnx
+
+    - name: Build Solution
+      run: dotnet build LibreScan.slnx --configuration Release --no-restore
+
+    - name: Run Unit Tests
+      run: dotnet test tests/LibreScan.Tests/LibreScan.Tests.csproj --configuration Release --no-build --verbosity normal --logger "console;verbosity=detailed"

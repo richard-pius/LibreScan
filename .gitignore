@@ -1,20 +1,50 @@
-# Build output
+# Build and Release output
 publish/
 Output/
+release/*.exe
+release/*.zip
+release/stage_portable/
+!release/*.md
 **/bin/
 **/obj/
+**/publish/
 
-# ClamAV binaries (downloaded by build pipeline)
+# ClamAV binaries (downloaded/extracted for runtime)
 clamav_bin/
 
 # Quarantine data
 Quarantine/
+*.quarantine
 
-# IDE
+# Test results and coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# User and Runtime data
+*.log
+crash.log
+state.json
+_clamav_extract_temp/
+*.zip
+
+# IDE and Editor files
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+.idea/
 
-# Temp
-_clamav_extract_temp/
-*.zip
+# Windows OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Inno Setup output
+*.tmp
+_is*.*
+

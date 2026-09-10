@@ -239,14 +239,17 @@ if ($ConfSample) {
     Write-Host "  Configured: $ConfTarget (UTF-8 without BOM)" -ForegroundColor Green
 }
 elseif (Test-Path $ConfTarget) {
-    # Ensure existing freshclam.conf has no BOM
-    $rawBytes = [System.IO.File]::ReadAllBytes($ConfTarget)
-    if ($rawBytes.Length -ge 3 -and $rawBytes[0] -eq 0xEF -and $rawBytes[1] -eq 0xBB -and $rawBytes[2] -eq 0xBF) {
-        $noBomBytes = $rawBytes[3..($rawBytes.Length - 1)]
-        [System.IO.File]::WriteAllBytes($ConfTarget, $noBomBytes)
-        Write-Host "  Removed UTF-8 BOM from existing $ConfTarget" -ForegroundColor Yellow
+    # Ensure existing freshclam.conf has no BOM and has DatabaseMirror configured
+    $confContent = Get-Content $ConfTarget -Raw -Encoding UTF8
+    $confContent = $confContent -replace '(?m)^\s*Example\s*$', '# Example (removed by build pipeline)'
+    if ($confContent -notmatch '(?m)^\s*DatabaseMirror\s+database\.clamav\.net') {
+        $confContent = $confContent.TrimEnd()
+        $confContent += "`r`n`r`n# --- Configured by LibreScan build pipeline ---`r`n"
+        $confContent += "DatabaseMirror database.clamav.net`r`n"
     }
-    Write-Host "  freshclam.conf already exists - preserved." -ForegroundColor Yellow
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ConfTarget, $confContent, $utf8NoBom)
+    Write-Host "  freshclam.conf validated & preserved (UTF-8 without BOM)." -ForegroundColor Green
 }
 else {
     # Fallback minimal freshclam.conf

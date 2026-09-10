@@ -1,4 +1,6 @@
+using System.Windows;
 using System.Windows.Input;
+using Application = System.Windows.Application;
 
 namespace LibreScan.Helpers;
 
@@ -22,6 +24,18 @@ public sealed class RelayCommand : ICommand
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
+    }
+
+    public void RaiseCanExecuteChanged()
+    {
+        try
+        {
+            if (Application.Current?.Dispatcher is { } d && !d.CheckAccess())
+                d.InvokeAsync(CommandManager.InvalidateRequerySuggested);
+            else
+                CommandManager.InvalidateRequerySuggested();
+        }
+        catch { }
     }
 
     public bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;

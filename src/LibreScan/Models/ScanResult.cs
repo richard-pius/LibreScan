@@ -48,3 +48,30 @@ public sealed class QuarantineEntry
     public string ThreatName { get; set; } = string.Empty;
     public DateTime QuarantinedAt { get; set; }
 }
+
+/// <summary>
+/// Model representing a storage drive available for scanning (C:, D:, USB flash drive, etc.).
+/// </summary>
+public sealed class DriveItem
+{
+    public string Name { get; init; } = string.Empty;
+    public string VolumeLabel { get; init; } = string.Empty;
+    public string DisplayName { get; init; } = string.Empty;
+    public string DriveTypeDescription { get; init; } = string.Empty;
+    public string CapacityDescription { get; init; } = string.Empty;
+    public double FreePercentage { get; init; }
+    public double UsedPercentage => Math.Clamp(100.0 - FreePercentage, 0.0, 100.0);
+    public bool IsReady { get; init; }
+}
+
+/// <summary>
+/// Persisted application state for scan history and preferences.
+/// </summary>
+public sealed class AppState
+{
+    public DateTime? LastScanDate { get; set; }
+    public int LastScanFiles { get; set; }
+    public int LastScanThreats { get; set; }
+    public string LastScanType { get; set; } = string.Empty;
+}
+

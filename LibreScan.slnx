@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LibreScan/LibreScan.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LibreScan.Tests/LibreScan.Tests.csproj" />
+  </Folder>
+</Solution>
