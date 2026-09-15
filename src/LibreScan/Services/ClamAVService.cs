@@ -330,6 +330,25 @@ public sealed partial class ClamAVService
             };
         }
 
+        var validTargets = new List<string>();
+        foreach (var t in targetPaths)
+        {
+            if (string.IsNullOrWhiteSpace(t)) continue;
+            string clean = t.Trim('\"', ' ');
+            if (!string.IsNullOrEmpty(clean))
+                validTargets.Add(clean);
+        }
+
+        if (validTargets.Count == 0)
+        {
+            return new ScanResult
+            {
+                Success = true,
+                Duration = TimeSpan.Zero,
+                FullLog = "No valid scan targets specified.",
+            };
+        }
+
         if (!File.Exists(ClamScanPath))
             throw new FileNotFoundException("ClamAV clamscan.exe not found.", ClamScanPath);
 
@@ -368,26 +387,9 @@ public sealed partial class ClamAVService
         psi.ArgumentList.Add("--exclude-dir=\\$Recycle\\.Bin");
         psi.ArgumentList.Add(@"--exclude=(pagefile|hiberfil|swapfile|dumpstack)\.sys");
 
-        int validTargetCount = 0;
-        foreach (var t in targetPaths)
+        foreach (var target in validTargets)
         {
-            if (string.IsNullOrWhiteSpace(t)) continue;
-            string clean = t.Trim('\"', ' ');
-            if (!string.IsNullOrEmpty(clean))
-            {
-                psi.ArgumentList.Add(clean);
-                validTargetCount++;
-            }
-        }
-
-        if (validTargetCount == 0)
-        {
-            return new ScanResult
-            {
-                Success = true,
-                Duration = TimeSpan.Zero,
-                FullLog = "No valid scan targets specified.",
-            };
+            psi.ArgumentList.Add(target);
         }
 
         var timer = Stopwatch.StartNew();
