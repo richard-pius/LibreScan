@@ -43,7 +43,7 @@ LibreScan uses **xUnit** for unit and integration tests under `tests/LibreScan.T
   ```powershell
   dotnet test
   ```
-- All 56 existing unit tests must pass with 0 errors.
+- All 70 existing unit tests must pass with 0 errors.
 
 ---
 

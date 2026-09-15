@@ -343,6 +343,13 @@ if (Test-Path $ClamAVBin) {
     }
     Copy-Item -Path "$ClamAVBin\*" -Destination $PublishClamAV -Recurse -Force
 
+    # Remove debug symbols, static libraries, and dev folders from publish staging
+    Get-ChildItem -Path $PublishClamAV -Include "*.pdb", "*.lib", "*.exp" -Recurse -File | Remove-Item -Force -ErrorAction SilentlyContinue
+    foreach ($devFolder in @("include", "certs", "UserManual")) {
+        $devPath = Join-Path $PublishClamAV $devFolder
+        if (Test-Path $devPath) { Remove-Item -Path $devPath -Recurse -Force -ErrorAction SilentlyContinue }
+    }
+
     # Double check publish freshclam.conf has no BOM
     $pubConf = Join-Path $PublishClamAV "freshclam.conf"
     if (Test-Path $pubConf) {
@@ -395,7 +402,8 @@ if (-not $SkipInstaller) {
         "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
         "${env:ProgramFiles}\Inno Setup 6\ISCC.exe",
         "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
-        "C:\Program Files\Inno Setup 6\ISCC.exe"
+        "C:\Program Files\Inno Setup 6\ISCC.exe",
+        "${env:LOCALAPPDATA}\Programs\Inno Setup 6\ISCC.exe"
     )
 
     $IsccExe = $IsccCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1

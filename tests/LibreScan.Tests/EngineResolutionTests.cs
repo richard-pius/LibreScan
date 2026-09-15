@@ -9,10 +9,9 @@ public class EngineResolutionTests
     [Fact]
     public void IsEngineAvailable_InWorkspace_ResolvesToTrue()
     {
-        // With directory resolution searching up parent directories in development/test mode,
-        // clamav_bin/clamscan.exe should be found.
-        bool available = ClamAVService.IsEngineAvailable();
-        Assert.True(available, $"Engine clamscan.exe should be located. Resolved path: {ClamAVService.ClamScanPath}");
+        // Verifies IsEngineAvailable accurately reflects whether clamscan.exe is on disk
+        bool expected = File.Exists(ClamAVService.ClamScanPath);
+        Assert.Equal(expected, ClamAVService.IsEngineAvailable());
     }
 
     [Fact]

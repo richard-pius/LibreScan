@@ -3,7 +3,7 @@
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL--2.0-blue.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(x64)-0078D6.svg)](https://microsoft.com/windows)
 [![Framework: .NET 10](https://img.shields.io/badge/Framework-.NET%2010%20WPF-512BD4.svg)](https://dotnet.microsoft.com/)
-[![Tests: 56 Passed](https://img.shields.io/badge/Tests-56%20Passed%20(100%25)-brightgreen.svg)](tests/)
+[![Tests: 70 Passed](https://img.shields.io/badge/Tests-70%20Passed%20(100%25)-brightgreen.svg)](tests/)
 [![Engine: ClamAV](https://img.shields.io/badge/Engine-ClamAV®%20Portable-E24329.svg)](https://www.clamav.net/)
 
 **LibreScan Security** is a premium, open-source Windows-native antivirus frontend for the **ClamAV®** engine. Designed with a sleek, high-contrast dark aesthetic inspired by modern developer tooling, LibreScan brings enterprise-grade scanning, automated definitions management, shell integration, and quarantine isolation to the Windows desktop.
@@ -91,7 +91,7 @@ cd librescan-security
 # Or compile via standard dotnet CLI
 dotnet build src\LibreScan\LibreScan.csproj -c Release
 
-# Run automated tests (56 tests)
+# Run automated tests (70 tests)
 dotnet test
 ```
 

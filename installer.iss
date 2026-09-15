@@ -60,7 +60,7 @@ Name: "{app}\Quarantine";         Permissions: users-modify
 ; Source from the dotnet publish output directory
 [Files]
 Source: "publish\{#MyAppExeName}";       DestDir: "{app}"; Flags: ignoreversion
-Source: "publish\clamav_bin\*";          DestDir: "{app}\clamav_bin"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "publish\clamav_bin\*";          DestDir: "{app}\clamav_bin"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,*.lib,*.exp"
 Source: "publish\Assets\*";              DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 Source: "publish\Quarantine\*";          DestDir: "{app}\Quarantine"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 ; Include any remaining published support files (PDBs, configs, etc.)
@@ -85,11 +85,6 @@ Root: HKLM; \
   ValueData: """{app}\{#MyAppExeName}"" --startup"; \
   Flags: uninsdeletevalue; \
   Tasks: startupentry
-; Clean up legacy HKCU auto-start entry if present from older installations
-Root: HKCU; \
-  Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
-  ValueName: "{#MyAppName}"; \
-  Flags: uninsdeletevalue dontcreatekey
 
 ; Explorer Context Menu: Files
 Root: HKLM; Subkey: "Software\Classes\*\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
@@ -100,6 +95,11 @@ Root: HKLM; Subkey: "Software\Classes\*\shell\LibreScan\command"; ValueType: str
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: contextmenu
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey; Tasks: contextmenu
+
+; Explorer Context Menu: Folder Background (empty space in directory)
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: contextmenu
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%V"""; Flags: uninsdeletekey; Tasks: contextmenu
 
 ; Explorer Context Menu: Drives / USBs
 Root: HKLM; Subkey: "Software\Classes\Drive\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
@@ -131,8 +131,8 @@ Filename: "{sys}\taskkill.exe"; \
 
 [UninstallDelete]
 ; Clean up user-generated data (virus definitions, quarantined files)
-Type: filesandirs; Name: "{app}\clamav_bin\database"
-Type: filesandirs; Name: "{app}\Quarantine"
+Type: filesandordirs; Name: "{app}\clamav_bin\database"
+Type: filesandordirs; Name: "{app}\Quarantine"
 
 ; ─── Pascal Script: Pre-Install Process Kill ("File in Use" Fix) ─────────────
 [Code]
