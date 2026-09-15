@@ -85,11 +85,6 @@ Root: HKLM; \
   ValueData: """{app}\{#MyAppExeName}"" --startup"; \
   Flags: uninsdeletevalue; \
   Tasks: startupentry
-; Clean up legacy HKCU auto-start entry if present from older installations
-Root: HKCU; \
-  Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
-  ValueName: "{#MyAppName}"; \
-  Flags: uninsdeletevalue dontcreatekey
 
 ; Explorer Context Menu: Files
 Root: HKLM; Subkey: "Software\Classes\*\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
@@ -100,6 +95,11 @@ Root: HKLM; Subkey: "Software\Classes\*\shell\LibreScan\command"; ValueType: str
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: contextmenu
 Root: HKLM; Subkey: "Software\Classes\Directory\shell\LibreScan\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey; Tasks: contextmenu
+
+; Explorer Context Menu: Folder Background (empty space in directory)
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan"; ValueType: string; ValueName: "Icon"; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: contextmenu
+Root: HKLM; Subkey: "Software\Classes\Directory\Background\shell\LibreScan\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%V"""; Flags: uninsdeletekey; Tasks: contextmenu
 
 ; Explorer Context Menu: Drives / USBs
 Root: HKLM; Subkey: "Software\Classes\Drive\shell\LibreScan"; ValueType: string; ValueData: "Scan with LibreScan"; Flags: uninsdeletekey; Tasks: contextmenu

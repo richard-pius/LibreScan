@@ -604,7 +604,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 RunOnUI(() => ElapsedTime = sw.Elapsed.ToString(@"mm\:ss"));
             }
         }
-        catch (OperationCanceledException) { /* expected */ }
+        catch (OperationCanceledException) { /* expected on cancel */ }
+        catch (ObjectDisposedException) { /* expected if CTS disposed */ }
+        catch { /* defensive against unobserved task exceptions */ }
     }
 
     // ═════════════════════════════════════════════════════════════════════════
@@ -837,6 +839,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
             else
             {
                 Log($"FAILED to quarantine: {threat.FilePath} (file in use or requires elevation)");
+                StatusText    = "Quarantine Failed";
+                StatusSubtext = "File in use by another process or requires administrator elevation";
+                CurrentStatus = StatusLevel.Warning;
+                InvalidateCommands();
             }
         }
         finally

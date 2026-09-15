@@ -304,6 +304,7 @@ public sealed partial class ClamAVService
     /// </summary>
     public static string FormatBytes(long bytes)
     {
+        if (bytes <= 0) return "0 B";
         if (bytes < 1024) return $"{bytes} B";
         if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
         if (bytes < 1024 * 1024 * 1024) return $"{bytes / (1024.0 * 1024.0):F1} MB";
@@ -331,6 +332,9 @@ public sealed partial class ClamAVService
 
         if (!File.Exists(ClamScanPath))
             throw new FileNotFoundException("ClamAV clamscan.exe not found.", ClamScanPath);
+
+        // Ensure database directory exists so clamscan does not fail with code 2 on fresh installs
+        Directory.CreateDirectory(DatabaseDir);
 
         var threats = new List<ThreatInfo>();
         var log     = new StringBuilder();
@@ -552,11 +556,28 @@ public sealed partial class ClamAVService
             }
             else
             {
-                string text = File.ReadAllText(FreshClamConf, Encoding.UTF8);
-                bool modified = false;
+                var attr = File.GetAttributes(FreshClamConf);
+                if (attr.HasFlag(FileAttributes.ReadOnly))
+                    File.SetAttributes(FreshClamConf, attr & ~FileAttributes.ReadOnly);
+
+                byte[] rawBytes = File.ReadAllBytes(FreshClamConf);
+                int offset = 0;
+                if (rawBytes.Length >= 3 && rawBytes[0] == 0xEF && rawBytes[1] == 0xBB && rawBytes[2] == 0xBF)
+                {
+                    offset = 3;
+                }
+
+                string text = Encoding.UTF8.GetString(rawBytes, offset, rawBytes.Length - offset);
+                bool modified = offset > 0;
+
                 if (Regex.IsMatch(text, @"(?m)^\s*Example\s*$"))
                 {
                     text = Regex.Replace(text, @"(?m)^\s*Example\s*$", "# Example (disabled)");
+                    modified = true;
+                }
+                if (Regex.IsMatch(text, @"(?m)^\s*DatabaseDirectory\s+.*$"))
+                {
+                    text = Regex.Replace(text, @"(?m)^\s*DatabaseDirectory\s+.*$", "# DatabaseDirectory configured at runtime via --datadir");
                     modified = true;
                 }
                 if (!Regex.IsMatch(text, @"(?m)^\s*DatabaseMirror\s+database\.clamav\.net"))

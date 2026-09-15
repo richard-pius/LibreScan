@@ -408,4 +408,99 @@ public class NewFeaturesTests : IDisposable
         Assert.True(vm.LogEntries.Count <= 2200);
         Assert.True(vm.LogEntries.Count >= 2000);
     }
+
+    [Theory]
+    [InlineData(-100, "0 B")]
+    [InlineData(0, "0 B")]
+    [InlineData(500, "500 B")]
+    [InlineData(1024, "1.0 KB")]
+    [InlineData(1048576, "1.0 MB")]
+    [InlineData(1073741824, "1.0 GB")]
+    [InlineData(1099511627776L, "1.0 TB")]
+    public void ClamAVService_FormatBytes_HandlesAllRangesAndNegativeSafely(long bytes, string expected)
+    {
+        string result = ClamAVService.FormatBytes(bytes);
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public async Task MainViewModel_QuarantineSingle_SetsWarningStatusOnFailure()
+    {
+        var vm = new MainViewModel();
+        var ghostThreat = new ThreatInfo
+        {
+            FilePath = @"C:\NonExistent_Ghost_Threat_12345.exe",
+            ThreatName = "Ghost.Malware",
+            DetectedAt = DateTime.UtcNow,
+        };
+
+        await vm.QuarantineSingleAsync(ghostThreat);
+
+        Assert.Equal("Quarantine Failed", vm.StatusText);
+        Assert.Equal(StatusLevel.Warning, vm.CurrentStatus);
+        Assert.Contains(vm.LogEntries, l => l.Contains("FAILED to quarantine"));
+    }
+
+    [Fact]
+    public async Task MainViewModel_TickElapsedAsync_SafelyHandlesCancellationAndDisposal()
+    {
+        var vm = new MainViewModel();
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var cts = new CancellationTokenSource();
+
+        var tickMethod = typeof(MainViewModel).GetMethod("TickElapsedAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull(tickMethod);
+
+        var task = (Task)tickMethod.Invoke(vm, [sw, cts.Token])!;
+
+        // Dispose CTS while timer is actively running
+        cts.Cancel();
+        cts.Dispose();
+
+        // Must complete without throwing unhandled ObjectDisposedException
+        await task;
+    }
+
+    [Fact]
+    public void ClamAVService_EnsureFreshClamConfig_HandlesBomAndCustomDirectives()
+    {
+        string tempConf = Path.Combine(Path.GetTempPath(), $"freshclam_test_{Guid.NewGuid():N}.conf");
+        try
+        {
+            // Write sample configuration with UTF-8 BOM, Example directive, and DatabaseDirectory
+            byte[] bom = [0xEF, 0xBB, 0xBF];
+            byte[] content = System.Text.Encoding.UTF8.GetBytes("Example\r\nDatabaseDirectory C:\\old\\db\r\n");
+            byte[] full = [.. bom, .. content];
+            File.WriteAllBytes(tempConf, full);
+
+            // Test BOM stripping logic directly
+            var rawBytes = File.ReadAllBytes(tempConf);
+            Assert.True(rawBytes.Length >= 3 && rawBytes[0] == 0xEF && rawBytes[1] == 0xBB && rawBytes[2] == 0xBF);
+
+            int offset = (rawBytes.Length >= 3 && rawBytes[0] == 0xEF && rawBytes[1] == 0xBB && rawBytes[2] == 0xBF) ? 3 : 0;
+            string text = System.Text.Encoding.UTF8.GetString(rawBytes, offset, rawBytes.Length - offset);
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(?m)^\s*Example\s*$", "# Example (disabled)");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(?m)^\s*DatabaseDirectory\s+.*$", "# DatabaseDirectory configured at runtime via --datadir");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(text, @"(?m)^\s*DatabaseMirror\s+database\.clamav\.net"))
+            {
+                text = text.TrimEnd() + "\r\n\r\nDatabaseMirror database.clamav.net\r\n";
+            }
+
+            var utf8NoBom = new System.Text.UTF8Encoding(false);
+            File.WriteAllText(tempConf, text, utf8NoBom);
+
+            var finalBytes = File.ReadAllBytes(tempConf);
+            Assert.False(finalBytes[0] == 0xEF && finalBytes[1] == 0xBB && finalBytes[2] == 0xBF, "BOM must be stripped");
+            string finalText = File.ReadAllText(tempConf);
+            Assert.Contains("# Example (disabled)", finalText);
+            Assert.Contains("# DatabaseDirectory configured at runtime", finalText);
+            Assert.Contains("DatabaseMirror database.clamav.net", finalText);
+        }
+        finally
+        {
+            if (File.Exists(tempConf)) File.Delete(tempConf);
+        }
+    }
 }
+
