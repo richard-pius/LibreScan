@@ -938,7 +938,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             try
             {
-                File.WriteAllLines(dialog.FileName, LogEntries);
+                var lines = LogEntries.ToList();
+                File.WriteAllLines(dialog.FileName, lines);
                 Log($"Log exported to: {dialog.FileName}");
             }
             catch (Exception ex)

@@ -38,9 +38,9 @@ Built on .NET 10 and WPF with a high-contrast dark aesthetic, LibreScan Security
 
 | File | Description | SHA256 Checksum |
 | :--- | :--- | :--- |
-| `LibreScan.exe` | Standalone single-file self-contained executable (win-x64) | `5D6C66EE56AA61F123697CE7C7855CC1DA775AAD34C8C24C530CD7F37CB9C525` |
-| `LibreScan_v1.0.0_win-x64_portable.zip` | Complete portable package with ClamAV engine binaries | `2F34727427AED98D57C949CE4ED7540ACE28EC7E593FD85636CDC55935C1397C` |
-| `LibreScan_Setup_1.0.0.exe` | Windows Setup installer script (`installer/LibreScan.iss`) | *(Compile with Inno Setup)* |
+| `LibreScan_Setup_1.0.0.exe` | Windows Setup Installer with ClamAV & Definitions bundled | `D329573D351B48982902491C1D866BB071656A9E06532BA639CD85C26438490D` |
+| `LibreScan_v1.0.0_win-x64_portable.zip` | Complete portable package with ClamAV engine & definitions | `F29C1C2B487C122ED3999B48051D7E51BEA78C7D6F053918A086BD029BC5E4B0` |
+| `LibreScan.exe` | Standalone single-file self-contained executable (win-x64) | `F4289E4570B911594D09C226D3606DEDFE5EC772A7764BF2EF0A1D22972EA7EE` |
 
 ---
 

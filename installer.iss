@@ -60,7 +60,7 @@ Name: "{app}\Quarantine";         Permissions: users-modify
 ; Source from the dotnet publish output directory
 [Files]
 Source: "publish\{#MyAppExeName}";       DestDir: "{app}"; Flags: ignoreversion
-Source: "publish\clamav_bin\*";          DestDir: "{app}\clamav_bin"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "publish\clamav_bin\*";          DestDir: "{app}\clamav_bin"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb,*.lib,*.exp"
 Source: "publish\Assets\*";              DestDir: "{app}\Assets"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 Source: "publish\Quarantine\*";          DestDir: "{app}\Quarantine"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 ; Include any remaining published support files (PDBs, configs, etc.)
@@ -131,8 +131,8 @@ Filename: "{sys}\taskkill.exe"; \
 
 [UninstallDelete]
 ; Clean up user-generated data (virus definitions, quarantined files)
-Type: filesandirs; Name: "{app}\clamav_bin\database"
-Type: filesandirs; Name: "{app}\Quarantine"
+Type: filesandordirs; Name: "{app}\clamav_bin\database"
+Type: filesandordirs; Name: "{app}\Quarantine"
 
 ; ─── Pascal Script: Pre-Install Process Kill ("File in Use" Fix) ─────────────
 [Code]

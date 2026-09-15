@@ -350,4 +350,62 @@ public class NewFeaturesTests : IDisposable
 
         Assert.Contains(vm.LogEntries, l => l.Contains("External target not found"));
     }
+
+    [Fact]
+    public void MainViewModel_DriveSelector_OpensAndClosesCorrectly()
+    {
+        var vm = new MainViewModel();
+        Assert.False(vm.IsDriveSelectorOpen);
+
+        vm.OpenDriveSelectorCommand.Execute(null);
+        Assert.True(vm.IsDriveSelectorOpen);
+        Assert.NotEmpty(vm.AvailableDrives);
+
+        vm.CloseDriveSelectorCommand.Execute(null);
+        Assert.False(vm.IsDriveSelectorOpen);
+    }
+
+    [Fact]
+    public void ClamAVService_TryTerminateProcessesUsingFile_HandlesEdgeCasesGracefully()
+    {
+        // Must handle null, empty, whitespace, and ghost paths without throwing exceptions
+        ClamAVService.TryTerminateProcessesUsingFile("");
+        ClamAVService.TryTerminateProcessesUsingFile("   ");
+        ClamAVService.TryTerminateProcessesUsingFile(@"C:\NonExistent_123\ghost.exe");
+    }
+
+    [Fact]
+    public async Task MainViewModel_QuarantineSingleAsync_NonExistentFile_LogsFailed()
+    {
+        var vm = new MainViewModel();
+        var threat = new ThreatInfo
+        {
+            FilePath = @"C:\NonExistent_Ghost_File.exe",
+            ThreatName = "Ghost.Threat",
+            DetectedAt = DateTime.UtcNow,
+        };
+
+        await vm.QuarantineSingleAsync(threat);
+
+        Assert.Contains(vm.LogEntries, l => l.Contains("FAILED to quarantine"));
+    }
+
+    [Fact]
+    public void MainViewModel_LogBatchTrimming_TrimsWhenThresholdExceeded()
+    {
+        var vm = new MainViewModel();
+
+        // Push 2250 items through the log mechanism by simulating OutputReceived
+        var method = typeof(MainViewModel).GetMethod("Log", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull(method);
+
+        for (int i = 0; i < 2210; i++)
+        {
+            method.Invoke(vm, [$"Test Log Line {i}"]);
+        }
+
+        // Should have trimmed down to 2000 + recent excess
+        Assert.True(vm.LogEntries.Count <= 2200);
+        Assert.True(vm.LogEntries.Count >= 2000);
+    }
 }
