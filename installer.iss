@@ -4,13 +4,14 @@
 ; ═══════════════════════════════════════════════════════════════════════════════
 
 #define MyAppName      "LibreScan Security"
-#define MyAppVersion   "1.0.0"
+#define MyAppVersion   "1.1.0"
 #define MyAppPublisher "LibreScan Security Project"
 #define MyAppURL       "https://github.com/librescan/librescan-security"
 #define MyAppExeName   "LibreScan.exe"
 
 ; ─── Setup Configuration ─────────────────────────────────────────────────────
 [Setup]
+LicenseFile=LICENSE
 AppId={{7F3A91C2-D4E8-4B5A-9C6F-1E2D3A4B5C6D}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}

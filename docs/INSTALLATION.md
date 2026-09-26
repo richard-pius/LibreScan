@@ -1,6 +1,6 @@
-# Installation Guide — LibreScan Security
+﻿# Installation Guide â€” LibreScan Security
 
-LibreScan Security is a modern, lightweight, Windows-native frontend for the ClamAV® antivirus engine. This guide covers system requirements, installation methods, initial configuration, and troubleshooting.
+LibreScan Security is a modern, lightweight, Windows-native frontend for the ClamAVÂ® antivirus engine. This guide covers system requirements, installation methods, initial configuration, and troubleshooting.
 
 ---
 
@@ -12,7 +12,7 @@ LibreScan Security is a modern, lightweight, Windows-native frontend for the Cla
 | **Processor** | 64-bit (x64) Intel / AMD dual-core | Quad-core 2.5 GHz or higher |
 | **Memory (RAM)** | 2 GB RAM | 4 GB RAM or more |
 | **Disk Space** | ~500 MB free space (for virus definitions) | 2 GB free SSD space |
-| **Display** | 1280 × 720 resolution | 1920 × 1080 resolution or higher |
+| **Display** | 1280 Ã— 720 resolution | 1920 Ã— 1080 resolution or higher |
 | **Permissions** | Standard User (Admin for Inno Setup installer) | Administrator (for locked OS file quarantine) |
 | **Network** | Internet connection for initial definitions download | Broadband connection for daily signature updates |
 
@@ -22,7 +22,7 @@ LibreScan Security is a modern, lightweight, Windows-native frontend for the Cla
 
 ### Method 1: Portable Release (Recommended for Quick Use)
 
-1. Download the latest `LibreScan_v1.0.0_win-x64_portable.zip` from [GitHub Releases](https://github.com/librescan/librescan-security/releases).
+1. Download the latest `LibreScan_v1.1.0_win-x64_portable.zip` from [GitHub Releases](https://github.com/librescan/librescan-security/releases).
 2. Extract the archive to a folder of your choice (e.g., `C:\Program Files\LibreScan` or `C:\Tools\LibreScan`).
 3. Run `LibreScan.exe`.
 4. On first launch:
@@ -40,7 +40,7 @@ The Windows Setup Wizard provides system-wide integration:
 - Sets appropriate read/write permissions on the Quarantine and Database folders.
 
 #### Steps:
-1. Download `LibreScan_Setup_1.0.0.exe` from [GitHub Releases](https://github.com/librescan/librescan-security/releases).
+1. Download `LibreScan_Setup_1.1.0.exe` from [GitHub Releases](https://github.com/librescan/librescan-security/releases).
 2. Run the installer (Administrator permissions required).
 3. Select your desired options:
    - [x] **Create a desktop shortcut**
@@ -100,3 +100,4 @@ cd librescan-security
   - Close LibreScan from the system tray (right-click icon > **Exit**).
   - Delete the extracted folder.
   - (Optional) Remove scan history by deleting `%LocalAppData%\LibreScan`.
+

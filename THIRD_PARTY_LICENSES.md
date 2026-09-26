@@ -66,3 +66,8 @@ LibreScan Security utilizes modern Windows system fonts:
 ## 5. Application Artwork and Icons
 - **Shield & Checkmark Logo (`Assets/librescan.ico`)**: Programmatically generated using original vector mathematics and procedural GDI+ geometry in `generate_icon.ps1`.
 - **Status & Copyright**: Original work created specifically for LibreScan Security. Licensed under the project's primary license (GPL-2.0) and free from third-party copyright claims or proprietary image licensing restrictions.
+
+## GPLv2 Source Code Offer for ClamAV
+The compiled ClamAV binaries distributed with LibreScan Security are licensed under the GNU General Public License v2.0. A complete machine-readable copy of the corresponding source code is available upon request for a period of at least three years from the date of distribution. 
+
+You may request the source code by opening an issue on this repository, or you may download it directly from the official Cisco Talos repository matching the exact version bundled: https://github.com/Cisco-Talos/clamav/releases

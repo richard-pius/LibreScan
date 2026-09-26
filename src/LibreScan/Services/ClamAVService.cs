@@ -56,6 +56,23 @@ public sealed partial class ClamAVService
     public static Regex ScannedRegex => GeneratedScannedRegex();
     public static Regex InfectedRegex => GeneratedInfectedRegex();
 
+    private static readonly HashSet<string> ProtectedProcesses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "svchost", "lsass", "csrss", "smss", "services", "wininit",
+        "winlogon", "dwm", "explorer", "System", "ntoskrnl",
+        "conhost", "RuntimeBroker", "SearchHost", "StartMenuExperienceHost",
+        "ShellExperienceHost", "sihost", "fontdrvhost", "WmiPrvSE"
+    };
+
+    private static readonly string[] ProtectedPaths = 
+    {
+        Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "System32"),
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysWOW64"),
+        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)
+    };
+
     // ── Concurrency, Caches & Process State ──────────────────────────────────
     private long _lastOutputTick;
     private readonly object _processLock = new();
@@ -679,14 +696,15 @@ public sealed partial class ClamAVService
     /// Attempts to terminate any processes holding an execution lock on the given file.
     /// Essential for quarantining actively executing malware.
     /// </summary>
-    public static void TryTerminateProcessesUsingFile(string filePath)
+    public static bool TryTerminateProcessesUsingFile(string filePath)
     {
-        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (string.IsNullOrWhiteSpace(filePath)) return false;
 
+        var processes = Process.GetProcesses();
         try
         {
             string fullTarget = Path.GetFullPath(filePath);
-            foreach (var proc in Process.GetProcesses())
+            foreach (var proc in processes)
             {
                 try
                 {
@@ -699,23 +717,50 @@ public sealed partial class ClamAVService
                     if (!string.IsNullOrEmpty(procPath) &&
                         string.Equals(Path.GetFullPath(procPath), fullTarget, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (ProtectedProcesses.Contains(proc.ProcessName))
+                        {
+                            Debug.WriteLine($"WARNING: Prevented termination of protected process {proc.ProcessName}");
+                            continue;
+                        }
+
                         proc.Kill(entireProcessTree: true);
                         proc.WaitForExit(1000);
                     }
                 }
                 catch { }
-                finally
-                {
-                    proc.Dispose();
-                }
             }
         }
         catch { }
+        finally
+        {
+            foreach (var proc in processes)
+            {
+                proc.Dispose();
+            }
+        }
+        return true;
     }
 
     public async Task<bool> QuarantineFileAsync(ThreatInfo threat)
     {
         if (!File.Exists(threat.FilePath)) return false;
+
+        string normalizedThreatPath = Path.GetFullPath(threat.FilePath);
+        foreach (var p in ProtectedPaths)
+        {
+            string normalizedProtectedPath = Path.GetFullPath(p);
+            if (!normalizedProtectedPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                normalizedProtectedPath += Path.DirectorySeparatorChar;
+            }
+
+            if (normalizedThreatPath.StartsWith(normalizedProtectedPath, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(normalizedThreatPath, Path.GetFullPath(p), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Cannot quarantine protected system path: {threat.FilePath}");
+            }
+        }
+
         Directory.CreateDirectory(QuarantineDir);
 
         var entry = new QuarantineEntry
