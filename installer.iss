@@ -6,7 +6,7 @@
 #define MyAppName      "LibreScan Security"
 #define MyAppVersion   "1.1.0"
 #define MyAppPublisher "LibreScan Security Project"
-#define MyAppURL       "https://github.com/librescan/librescan-security"
+#define MyAppURL       "https://github.com/richard-pius/LibreScan"
 #define MyAppExeName   "LibreScan.exe"
 
 ; ─── Setup Configuration ─────────────────────────────────────────────────────

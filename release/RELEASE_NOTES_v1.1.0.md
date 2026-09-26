@@ -1,20 +1,29 @@
-﻿# LibreScan Security v1.1.0 Release Notes
+# LibreScan Security v1.1.0 Release Notes
 
-**Release Date:** September 10, 2026  
-**Target Platform:** Windows 10 / Windows 11 (x64)  
-**License:** GNU General Public License v2.0 (GPL-2.0)  
+**Release Date:** September 26, 2026
+**Target Platform:** Windows 10 / Windows 11 (x64)
+**License:** GNU General Public License v2.0 (GPL-2.0)
 
 ---
 
-## ðŸš€ Overview
+## Overview
 
-We are proud to announce the initial production release of **LibreScan Security v1.1.0**, a modern, open-source Windows-native antivirus frontend for the **ClamAVÂ®** engine.
+We are proud to announce **LibreScan Security v1.1.0**, a maintenance and stability release for our modern, open-source Windows-native antivirus frontend powered by the **ClamAV** engine.
 
 Built on .NET 10 and WPF with a high-contrast dark aesthetic, LibreScan Security delivers fast, reliable, and user-friendly protection without telemetry, ads, or proprietary bloatware.
 
 ---
 
-## âœ¨ Key Features
+## What's New in v1.1.0
+
+- **Bug Fixes**: Fixed test suite deadlocks caused by synchronous blocking on async disposal and hidden UI confirmation prompts during headless test execution.
+- **Test Suite Expansion**: Expanded from 56 to 70 unit tests with improved coverage for quarantine operations and edge cases.
+- **Documentation Overhaul**: Updated all documentation with correct repository URLs, build instructions, and version references.
+- **Release Pipeline Improvements**: Refreshed build pipeline with updated installer and portable package generation.
+
+---
+
+## Key Features
 
 - **5 Versatile Scanning Modes**:
   - **Quick Scan**: Key user directories (Downloads, Desktop, Documents, Temp, Startup).
@@ -34,20 +43,19 @@ Built on .NET 10 and WPF with a high-contrast dark aesthetic, LibreScan Security
 
 ---
 
-## ðŸ“¦ Release Assets & Checksums
+## Release Assets & Checksums
 
 | File | Description | SHA256 Checksum |
 | :--- | :--- | :--- |
-| `LibreScan_Setup_1.1.0.exe` | Windows Setup Installer with ClamAV & Definitions bundled | `8363E0EFDBBEABC2DC4EA10F949B29EE5371CEC8BC93196AF0DBD839F26FC409` |
-| `LibreScan_v1.1.0_win-x64_portable.zip` | Complete portable package with ClamAV engine & definitions | `978D6CB8D68E7109A0506D6FD79EC14A4E340F3E493B142D3306C7FFDB9980A4` |
+| `LibreScan_Setup_1.1.0.exe` | Windows Setup Installer with ClamAV & Definitions bundled | `5D6EC7326F0CEE6540FA8D893DBB6578B5D042E4271214589E26F49F268D2CE5` |
+| `LibreScan_v1.1.0_win-x64_portable.zip` | Complete portable package with ClamAV engine & definitions | `73F44A1636A7EA90B92D18050D2351A444F4270A4EF6F332842E26DE2A1444F4` |
 | `LibreScan.exe` | Standalone single-file self-contained executable (win-x64) | `865DE8AA9A6BA7D3F01AFC9FDA62B0496FA7B4CFE22B6FC103D35DFED5E11C39` |
 
 ---
 
-## ðŸ’» System Requirements
+## System Requirements
 
 - **Operating System**: Windows 10 (64-bit, 1809+) or Windows 11 (64-bit)
 - **Processor**: 64-bit Intel or AMD processor
 - **Memory**: 2 GB RAM minimum (4 GB recommended)
 - **Disk Space**: ~500 MB free space for virus definitions
-

@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g. v1.1.0)'
+        required: false
+        default: 'v1.1.0'
+
+jobs:
+  publish-release:
+    if: >-
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && (startsWith(github.event.pull_request.head.ref, 'release/') || startsWith(github.event.pull_request.title, 'release:')))
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install Inno Setup
+      run: choco install innosetup --no-progress -y
+
+    - name: Run Tests
+      run: dotnet test tests/LibreScan.Tests/LibreScan.Tests.csproj --configuration Release --verbosity normal
+
+    - name: Run Build Pipeline
+      shell: powershell
+      run: |
+        .\build_pipeline.ps1
+
+    - name: Package Portable Zip and Verify Hashes
+      shell: powershell
+      run: |
+        $ReleaseDir = Join-Path $PWD "release"
+        if (-not (Test-Path $ReleaseDir)) { New-Item -ItemType Directory -Path $ReleaseDir -Force | Out-Null }
+        
+        $InstallerSrc = Join-Path $PWD "Output\LibreScan_Setup_1.1.0.exe"
+        if (Test-Path $InstallerSrc) {
+            Copy-Item -Path $InstallerSrc -Destination (Join-Path $ReleaseDir "LibreScan_Setup_1.1.0.exe") -Force
+        }
+        
+        $PublishExe = Join-Path $PWD "publish\LibreScan.exe"
+        if (Test-Path $PublishExe) {
+            Copy-Item -Path $PublishExe -Destination (Join-Path $ReleaseDir "LibreScan.exe") -Force
+        }
+        
+        $PortableZip = Join-Path $ReleaseDir "LibreScan_v1.1.0_win-x64_portable.zip"
+        if (-not (Test-Path $PortableZip)) {
+            Compress-Archive -Path "$PWD\publish\*" -DestinationPath $PortableZip -Force
+        }
+        
+        $checksumFile = Join-Path $ReleaseDir "SHA256SUMS.txt"
+        $filesToHash = @(
+            (Join-Path $ReleaseDir "LibreScan_Setup_1.1.0.exe"),
+            (Join-Path $ReleaseDir "LibreScan_v1.1.0_win-x64_portable.zip"),
+            (Join-Path $ReleaseDir "LibreScan.exe")
+        ) | Where-Object { Test-Path $_ }
+        
+        $hashes = Get-FileHash -Path $filesToHash -Algorithm SHA256
+        $lines = $hashes | ForEach-Object { "$($_.Hash)  $($_.Path | Split-Path -Leaf)" }
+        [System.IO.File]::WriteAllLines($checksumFile, $lines)
+        Get-Content $checksumFile
+
+    - name: Determine Release Tag and Title
+      id: release_meta
+      shell: powershell
+      run: |
+        if ($env:GITHUB_REF -like "refs/tags/*") {
+            $tag = $env:GITHUB_REF -replace "refs/tags/", ""
+        } elseif ("${{ github.event.inputs.tag_name }}" -ne "") {
+            $tag = "${{ github.event.inputs.tag_name }}"
+        } else {
+            $tag = "v1.1.0"
+        }
+        echo "TAG_NAME=$tag" >> $env:GITHUB_ENV
+        echo "RELEASE_TITLE=LibreScan Security $tag" >> $env:GITHUB_ENV
+
+    - name: Publish GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        name: ${{ env.RELEASE_TITLE }}
+        body_path: release/RELEASE_NOTES_v1.1.0.md
+        files: |
+          release/LibreScan_Setup_1.1.0.exe
+          release/LibreScan_v1.1.0_win-x64_portable.zip
+          release/LibreScan.exe
+          release/SHA256SUMS.txt
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

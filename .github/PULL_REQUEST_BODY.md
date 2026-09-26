@@ -1,45 +1,52 @@
-# Pull Request: LibreScan Security v1.0.0 Production Release & Comprehensive Documentation
+# Pull Request: LibreScan Security v1.1.0 Maintenance Release & Documentation Updates
 
-## 🎯 Summary
+## Summary
 
-This PR establishes the complete production-grade release and documentation framework for **LibreScan Security v1.0.0**, an open-source, Windows-native antivirus frontend powered by the ClamAV® engine.
-
----
-
-## 🚀 Key Deliverables & Changes
-
-### 1. Documentation Overhaul
-- **`README.md`**: Modernized with badges, features overview, system requirements, quickstart, build commands, and documentation links.
-- **`docs/INSTALLATION.md`**: Complete setup guide covering hardware/OS requirements, portable zip deployment, Windows Setup installer, building from source, and uninstallation.
-- **`docs/ARCHITECTURE.md`**: High-level technical architecture document with a Mermaid flowchart detailing `WM_COPYDATA` single-instance IPC, scan engine lifecycle, zombie process tree killing, file lock termination, quarantine vault, and dispatcher UI throttling.
-- **`docs/USER_GUIDE.md`**: Comprehensive end-user handbook covering scan modes, drag & drop, shell context menu, threat isolation, quarantine vault management, and activity log export.
-- **`docs/DEVELOPER_GUIDE.md`**: Developer and contributor guidelines including prerequisites, architecture conventions, coding standards, MVVM patterns, xUnit test standards, and PR workflows.
-
-### 2. Legal, Copyright & Licensing Compliance
-- **`LICENSE`**: GNU General Public License v2.0 with complete project notice for Richard Pius and contributors.
-- **`THIRD_PARTY_LICENSES.md`**: Comprehensive open-source legal attribution and notices covering ClamAV (GPL-2.0), Microsoft .NET Runtime (MIT), xUnit (Apache-2.0), Segoe UI / fonts (SIL OFL), and procedural vector icons.
-- **100% Free & Open Source**: No proprietary assets, no copyrighted brand logos, no stock imagery, no telemetry or tracking code.
-
-### 3. Repository & Packaging Setup
-- **`.gitignore`**: Updated to strictly exclude build outputs (`bin/`, `obj/`, `publish/`), release binaries (`release/*.exe`, `release/*.zip`), ClamAV engine binaries, test results, quarantine vault files, and crash logs, while tracking release markdown documentation.
-- **`release/`**: Automated release packaging script created standalone `LibreScan.exe` (win-x64 single-file) and `LibreScan_v1.0.0_win-x64_portable.zip`.
-- **`release/RELEASE_NOTES_v1.0.0.md`**: Detailed v1.0.0 release notes with SHA256 checksums for all release binaries.
-- **`.github/workflows/build-and-test.yml`**: GitHub Actions CI workflow to build and test on Windows runner with .NET 10.
+This PR delivers the **v1.1.0** maintenance and stability release for **LibreScan Security**, an open-source, Windows-native antivirus frontend powered by the ClamAV engine.
 
 ---
 
-## 🧪 Verification & Testing
+## Key Deliverables & Changes
 
-- [x] **56/56 Unit Tests Passing**: Full xUnit suite passes with 0 failures (`dotnet test`).
+### 1. Bug Fixes & Test Suite Stabilisation
+- **Fixed async deadlock in test teardown**: Wrapped `DeleteAllFromQuarantineAsync()` in `Task.Run()` inside `Dispose()` to prevent synchronous blocking on the test runner thread pool.
+- **Fixed hidden UI prompt crash**: Added `skipConfirmation` parameter to `QuarantineSingleAsync()` so unit tests no longer hang on `MessageBox.Show()` during headless execution.
+- **Expanded test suite**: 56 to 70 unit tests with improved quarantine operation coverage.
+
+### 2. Version Bump to v1.1.0
+- Updated version across all source and release files:
+  - `LibreScan.csproj` (`<Version>1.1.0</Version>`)
+  - `installer.iss` (`MyAppVersion "1.1.0"`)
+  - `MainWindow.xaml` (UI sidebar version label)
+  - `README.md`, all `docs/*.md`, and `release/*.md` files.
+
+### 3. Documentation Overhaul
+- **Repository URL Fix**: All links updated from placeholder `librescan/librescan-security` to the correct `richard-pius/LibreScan`.
+- **Clone directory fix**: `cd librescan-security` changed to `cd LibreScan` across README, INSTALLATION, and DEVELOPER_GUIDE.
+- **README.md**: Documentation section links now use absolute GitHub URLs for reliable rendering on any platform.
+- **Release notes**: Refreshed with correct date, changelog, and SHA256 checksums.
+
+### 4. Release Artifacts
+- **`LibreScan_Setup_1.1.0.exe`**: Fresh Inno Setup installer compiled with updated UI version.
+- **`LibreScan_v1.1.0_win-x64_portable.zip`**: New portable package from latest publish output.
+- **`SHA256SUMS.txt`**: Regenerated with verified checksums for all release binaries.
+
+---
+
+## Verification & Testing
+
+- [x] **70/70 Unit Tests Passing**: Full xUnit suite passes with 0 failures (`dotnet test`).
 - [x] **Zero Build Errors/Warnings**: Clean build with .NET 10 on win-x64.
 - [x] **Single-File Compilation**: `publish/LibreScan.exe` verified self-contained.
-- [x] **Archive Validation**: `release/LibreScan_v1.0.0_win-x64_portable.zip` generated with SHA256 checksum recorded.
+- [x] **Installer Compilation**: `LibreScan_Setup_1.1.0.exe` compiled successfully via Inno Setup 6.
+- [x] **Portable Archive**: `LibreScan_v1.1.0_win-x64_portable.zip` generated with SHA256 checksum recorded.
 
 ---
 
-## 📦 Release Asset Hashes
+## Release Asset Hashes
 
 | File | SHA256 Checksum |
 | :--- | :--- |
-| `LibreScan.exe` | `5D6C66EE56AA61F123697CE7C7855CC1DA775AAD34C8C24C530CD7F37CB9C525` |
-| `LibreScan_v1.0.0_win-x64_portable.zip` | `2F34727427AED98D57C949CE4ED7540ACE28EC7E593FD85636CDC55935C1397C` |
+| `LibreScan_Setup_1.1.0.exe` | `5D6EC7326F0CEE6540FA8D893DBB6578B5D042E4271214589E26F49F268D2CE5` |
+| `LibreScan_v1.1.0_win-x64_portable.zip` | `73F44A1636A7EA90B92D18050D2351A444F4270A4EF6F332842E26DE2A1444F4` |
+| `LibreScan.exe` | `865DE8AA9A6BA7D3F01AFC9FDA62B0496FA7B4CFE22B6FC103D35DFED5E11C39` |

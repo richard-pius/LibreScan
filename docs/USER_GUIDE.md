@@ -1,4 +1,4 @@
-﻿# User Guide â€” LibreScan Security
+# User Guide - LibreScan Security
 
 Welcome to the LibreScan Security user guide. This document explains how to use all features of LibreScan to protect your computer.
 
@@ -8,10 +8,10 @@ Welcome to the LibreScan Security user guide. This document explains how to use 
 
 When you launch LibreScan Security, the Dashboard displays:
 - **Status Shield**: Shows current protection status:
-  - ðŸŸ¢ **System Protected**: Virus definitions are current, and no active threats are pending.
-  - ðŸ”µ **Running Scan**: Scanning files with live file count and elapsed time.
-  - ðŸŸ  **Warning / Needs Update**: Virus definitions are older than 24 hours or missing.
-  - ðŸ”´ **Threats Found**: Malware detected. Prompt to review and quarantine threats.
+  - **System Protected** (green): Virus definitions are current, and no active threats are pending.
+  - **Running Scan** (blue): Scanning files with live file count and elapsed time.
+  - **Warning / Needs Update** (orange): Virus definitions are older than 24 hours or missing.
+  - **Threats Found** (red): Malware detected. Prompt to review and quarantine threats.
 - **Sidebar Details**:
   - Engine state and database update timestamp.
   - Last scan summary (files scanned, threats found, date/time).
@@ -23,25 +23,25 @@ When you launch LibreScan Security, the Dashboard displays:
 
 LibreScan provides 5 flexible scanning profiles:
 
-### âš¡ Quick Scan
+### Quick Scan
 - Scans common infection vectors and active user locations:
   - User Downloads, Desktop, and Documents folders.
   - Windows Startup directories.
   - Windows Temp directories.
 - Typically completes in under 60 seconds.
 
-### ðŸ” Full Scan
+### Full Scan
 - Performs an exhaustive deep scan across all fixed storage drives connected to your system (`C:\`, `D:\`, etc.).
 - Excludes system swap/hibernation files (`pagefile.sys`, `hiberfil.sys`) to avoid unnecessary lock warnings.
 
-### ðŸ“„ Scan File
+### Scan File
 - Click the **Scan File** card to open the Windows file picker.
 - Supports multi-selection: you can select one or several specific files (executables, archives, documents) to scan immediately.
 
-### ðŸ“ Scan Folder
+### Scan Folder
 - Click the **Scan Folder** card to select any specific directory or folder on your computer.
 
-### ðŸ’¾ Scan Drive (USB & Disks)
+### Scan Drive (USB & Disks)
 - Click the **Scan Drive** card to open the Drive Selection panel.
 - Displays all ready fixed, removable USB flash drives, and external disks with used/free capacity bars.
 - Click **Scan Drive** on any item to scan that specific disk.
@@ -105,4 +105,3 @@ Switch to the **Quarantine** tab from the sidebar:
 - The Dashboard contains a real-time **Activity Log** displaying engine events, scanned items, and update details.
 - **Clear**: Clears the visible log window.
 - **Export...**: Saves the complete log history to a timestamped `.txt` file for technical support or record-keeping.
-
