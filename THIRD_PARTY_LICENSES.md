@@ -5,19 +5,19 @@ This document provides legal notices, attribution, and license texts for third-p
 
 ---
 
-## 1. ClamAV® Antivirus Engine
+## 1. ClamAV Antivirus Engine
 - **Project**: ClamAV (clamscan, freshclam)
-- **Copyright**: Copyright © 2026 Cisco Systems, Inc. and its affiliates.
+- **Copyright**: Copyright 2026 Cisco Systems, Inc. and its affiliates.
 - **License**: GNU General Public License, Version 2.0 (GPL-2.0)
 - **Website**: [https://www.clamav.net/](https://www.clamav.net/)
 - **Repository**: [https://github.com/Cisco-Talos/clamav](https://github.com/Cisco-Talos/clamav)
 
-*Notice: ClamAV® is a registered trademark of Cisco Systems, Inc. LibreScan Security is an independent, community-developed frontend and is not affiliated with, endorsed by, or sponsored by Cisco Systems, Inc.*
+*Notice: ClamAV is a registered trademark of Cisco Systems, Inc. LibreScan Security is an independent, community-developed frontend and is not affiliated with, endorsed by, or sponsored by Cisco Systems, Inc.*
 
 ---
 
 ## 2. Microsoft .NET Runtime and Windows Presentation Foundation (WPF)
-- **Copyright**: Copyright © .NET Foundation and Contributors.
+- **Copyright**: Copyright .NET Foundation and Contributors.
 - **License**: MIT License
 - **Website**: [https://dotnet.microsoft.com/](https://dotnet.microsoft.com/)
 
@@ -49,7 +49,7 @@ SOFTWARE.
 ---
 
 ## 3. xUnit.net Testing Framework (Build & Test Dependency)
-- **Copyright**: Copyright © .NET Foundation and Contributors.
+- **Copyright**: Copyright .NET Foundation and Contributors.
 - **License**: Apache License, Version 2.0
 - **Website**: [https://xunit.net/](https://xunit.net/)
 
@@ -68,6 +68,6 @@ LibreScan Security utilizes modern Windows system fonts:
 - **Status & Copyright**: Original work created specifically for LibreScan Security. Licensed under the project's primary license (GPL-2.0) and free from third-party copyright claims or proprietary image licensing restrictions.
 
 ## GPLv2 Source Code Offer for ClamAV
-The compiled ClamAV binaries distributed with LibreScan Security are licensed under the GNU General Public License v2.0. A complete machine-readable copy of the corresponding source code is available upon request for a period of at least three years from the date of distribution. 
+The compiled ClamAV binaries distributed with LibreScan Security are licensed under the GNU General Public License v2.0. A complete machine-readable copy of the corresponding source code is available upon request for a period of at least three years from the date of distribution.
 
 You may request the source code by opening an issue on this repository, or you may download it directly from the official Cisco Talos repository matching the exact version bundled: https://github.com/Cisco-Talos/clamav/releases
