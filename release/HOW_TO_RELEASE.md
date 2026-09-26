@@ -27,7 +27,7 @@ All release binaries and metadata have been compiled and verified in this `relea
 
 | File | Size | SHA256 Checksum |
 | :--- | :--- | :--- |
-| `LibreScan_Setup_1.1.0.exe` | ~163.79 MB | `F1A2DB20C2A9EC318425DEBE31948252F0F1788CFA14BE04B893E57190116439` |
+| `LibreScan_Setup_1.1.0.exe` | ~163.79 MB | `5D6EC7326F0CEE6540FA8D893DBB6578B5D042E4271214589E26F49F268D2CE5` |
 | `LibreScan_v1.1.0_win-x64_portable.zip` | ~212.89 MB | `73F44A1636A7EA90B92D18050D2351A444F4270A4EF6F332842E26DE2A1444F4` |
 | `LibreScan.exe` | ~165.10 MB | `865DE8AA9A6BA7D3F01AFC9FDA62B0496FA7B4CFE22B6FC103D35DFED5E11C39` |
 | `SHA256SUMS.txt` | < 1 KB | *(Checksum manifest)* |

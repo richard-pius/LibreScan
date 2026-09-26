@@ -120,7 +120,7 @@ if (-not $SkipClamAV) {
                             }
                         }
                         else {
-                            Invoke-WebRequest -Uri $url -OutFile $ZipPath -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) LibreScan/1.0"
+                            Invoke-WebRequest -Uri $url -OutFile $ZipPath -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) LibreScan/1.1.0"
                         }
 
                         if ((Test-Path $ZipPath) -and ((Get-Item $ZipPath).Length -gt 1000000)) {
