@@ -25,7 +25,7 @@ public class NewFeaturesTests : IDisposable
     {
         try
         {
-            _service.DeleteAllFromQuarantineAsync().GetAwaiter().GetResult();
+            Task.Run(() => _service.DeleteAllFromQuarantineAsync()).GetAwaiter().GetResult();
         }
         catch { }
 
@@ -385,7 +385,7 @@ public class NewFeaturesTests : IDisposable
             DetectedAt = DateTime.UtcNow,
         };
 
-        await vm.QuarantineSingleAsync(threat);
+        await vm.QuarantineSingleAsync(threat, skipConfirmation: true);
 
         Assert.Contains(vm.LogEntries, l => l.Contains("FAILED to quarantine"));
     }
@@ -434,7 +434,7 @@ public class NewFeaturesTests : IDisposable
             DetectedAt = DateTime.UtcNow,
         };
 
-        await vm.QuarantineSingleAsync(ghostThreat);
+        await vm.QuarantineSingleAsync(ghostThreat, skipConfirmation: true);
 
         Assert.Equal("Quarantine Failed", vm.StatusText);
         Assert.Equal(StatusLevel.Warning, vm.CurrentStatus);

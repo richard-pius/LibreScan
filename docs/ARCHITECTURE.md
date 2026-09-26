@@ -1,4 +1,4 @@
-# Architecture & Technical Design — LibreScan Security
+﻿# Architecture & Technical Design â€” LibreScan Security
 
 ## System Architecture
 
@@ -69,3 +69,4 @@ graph TD
 - Records last scan timestamp, files scanned count, threats found, and scan profile.
 - Restores seamlessly into UI status cards on cold launch.
 - Crash logs are captured safely from `DispatcherUnhandledException`, `AppDomain.UnhandledException`, and `TaskScheduler.UnobservedTaskException` to `%LocalAppData%\LibreScan\crash.log`.
+

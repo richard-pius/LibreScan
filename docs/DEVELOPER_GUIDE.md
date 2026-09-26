@@ -1,4 +1,4 @@
-# Developer & Contributor Guide — LibreScan Security
+﻿# Developer & Contributor Guide â€” LibreScan Security
 
 Thank you for contributing to LibreScan Security! This document outlines development setup, building, testing, coding conventions, and pull request guidelines.
 
@@ -77,3 +77,4 @@ LibreScan uses **xUnit** for unit and integration tests under `tests/LibreScan.T
 2. Commit your changes with clear, structured commit messages.
 3. Verify `dotnet test` and `dotnet build` are 100% clean.
 4. Push your branch to GitHub and open a Pull Request.
+

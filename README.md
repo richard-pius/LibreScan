@@ -56,13 +56,13 @@
 ## 🚀 Installation & Getting Started
 
 ### Option 1: Portable Release (Zero Installation)
-1. Download `LibreScan_v1.0.0_win-x64_portable.zip` from [Releases](https://github.com/librescan/librescan-security/releases).
+1. Download `LibreScan_v1.1.0_win-x64_portable.zip` from [Releases](https://github.com/librescan/librescan-security/releases).
 2. Extract the `.zip` to any preferred directory.
 3. Launch `LibreScan.exe`.
 4. On first run, LibreScan will automatically download the latest virus definitions from ClamAV servers.
 
 ### Option 2: Windows Setup Installer
-1. Download `LibreScan_Setup_1.0.0.exe` from [Releases](https://github.com/librescan/librescan-security/releases).
+1. Download `LibreScan_Setup_1.1.0.exe` from [Releases](https://github.com/librescan/librescan-security/releases).
 2. Run the installer with administrator privileges.
 3. Select desired integration options (Desktop shortcut, Windows auto-start, Explorer context menu).
 4. Launch LibreScan from the Start Menu or Desktop.
@@ -117,3 +117,8 @@ LibreScan Security is open-source software licensed under the **GNU General Publ
 - **ClamAV®** is a registered trademark of Cisco Systems, Inc.
 - LibreScan Security is an independent community project and is not affiliated with, endorsed by, or sponsored by Cisco Systems, Inc.
 - All application icons, graphical assets, and vector geometry are 100% original and free from proprietary copyright restrictions. See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+## GPLv2 Source Code Offer for ClamAV
+The compiled ClamAV binaries distributed with LibreScan Security are licensed under the GNU General Public License v2.0. A complete machine-readable copy of the corresponding source code is available upon request for a period of at least three years from the date of distribution. 
+
+You may request the source code by opening an issue on this repository, or you may download it directly from the official Cisco Talos repository matching the exact version bundled: https://github.com/Cisco-Talos/clamav/releases

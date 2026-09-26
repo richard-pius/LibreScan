@@ -18,8 +18,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
 {
     private readonly ClamAVService _clam = new();
     private CancellationTokenSource? _cts;
-    private DateTime _lastUpdateAttemptUtc = DateTime.MinValue;
-    public static readonly TimeSpan MinUpdateInterval = TimeSpan.FromMinutes(15);
+    private DateTime _lastUpdateAttemptUtc = Properties.Settings.Default.LastUpdateAttempt;
+    public static readonly TimeSpan MinUpdateInterval = TimeSpan.FromHours(2);
     private readonly HashSet<string> _activeQuarantineOperations = [];
 
     // ═════════════════════════════════════════════════════════════════════════
@@ -616,9 +616,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public async Task RunUpdateAsync(bool force = false)
     {
         // Rate-limit definition updates to prevent Cisco CDN IP bans
+        var elapsed = DateTime.UtcNow - _lastUpdateAttemptUtc;
         if (!force && ClamAVService.GetDatabaseDate() is not null)
         {
-            var elapsed = DateTime.UtcNow - _lastUpdateAttemptUtc;
             if (elapsed < MinUpdateInterval)
             {
                 var waitMins = Math.Max(1, (int)Math.Ceiling((MinUpdateInterval - elapsed).TotalMinutes));
@@ -626,6 +626,19 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 StatusText    = "System Protected";
                 StatusSubtext = $"Definitions are current · Last updated {DatabaseDate}";
                 CurrentStatus = StatusLevel.Protected;
+                return;
+            }
+        }
+        else if (force)
+        {
+            var forceCooldown = TimeSpan.FromMinutes(30);
+            if (elapsed < forceCooldown)
+            {
+                var waitMins = Math.Max(1, (int)Math.Ceiling((forceCooldown - elapsed).TotalMinutes));
+                Log($"Update forced too soon ({elapsed.TotalMinutes:F0}m ago). Waiting {waitMins}m to prevent IP ban.");
+                StatusText    = "Update Throttled";
+                StatusSubtext = "Please wait before forcing another update";
+                CurrentStatus = StatusLevel.Warning;
                 return;
             }
         }
@@ -646,6 +659,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
             if (ok)
             {
+                Properties.Settings.Default.LastUpdateAttempt = DateTime.UtcNow;
+                Properties.Settings.Default.Save();
+                
                 StatusText    = "System Protected";
                 StatusSubtext = $"Definitions updated · {DatabaseDate}";
                 CurrentStatus = StatusLevel.Protected;
@@ -701,6 +717,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private async Task QuarantineAllAsync()
     {
         if (IsQuarantining || DetectedThreats.Count == 0) return;
+
+        var result = System.Windows.MessageBox.Show(
+            "LibreScan may need to terminate active processes using this file. Unsaved work in those applications will be lost. Continue?", 
+            "Confirm Quarantine", 
+            System.Windows.MessageBoxButton.YesNo, 
+            System.Windows.MessageBoxImage.Warning);
+
+        if (result != System.Windows.MessageBoxResult.Yes) return;
+
         IsQuarantining = true;
 
         try
@@ -811,9 +836,21 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public async Task QuarantineSingleAsync(ThreatInfo? threat)
+    public async Task QuarantineSingleAsync(ThreatInfo? threat, bool skipConfirmation = false)
     {
         if (threat is null || IsQuarantining) return;
+
+        if (!skipConfirmation)
+        {
+            var result = System.Windows.MessageBox.Show(
+                "LibreScan may need to terminate active processes using this file. Unsaved work in those applications will be lost. Continue?", 
+                "Confirm Quarantine", 
+                System.Windows.MessageBoxButton.YesNo, 
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result != System.Windows.MessageBoxResult.Yes) return;
+        }
+
         IsQuarantining = true;
 
         try

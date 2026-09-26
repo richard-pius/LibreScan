@@ -93,7 +93,7 @@
                                    FontSize="12" FontWeight="Medium"
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    Margin="0,3,0,0"/>
-                        <TextBlock Text="v1.0.0" FontSize="10"
+                        <TextBlock Text="v1.1.0" FontSize="10"
                                    Foreground="{StaticResource TextMutedBrush}"
                                    Margin="0,8,0,0"/>
                     </StackPanel>
